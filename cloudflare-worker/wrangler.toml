@@ -1,0 +1,8 @@
+name = "persona-chat-worker"
+main = "worker.ts"
+compatibility_date = "2024-01-01"
+
+[env.production]
+vars = { }
+
+# Secrets are set via: wrangler secret put OPENAI_API_KEY

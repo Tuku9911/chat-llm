@@ -36,10 +36,11 @@ export function PersonaList({
       <div>
         {personas.map(p => (
           <div
+            onClick={() => onSelectPersona(p.id)}
             key={p.id}
             className={`persona-item ${p.id === selectedPersonaId ? "selected" : ""}`}
           >
-            <button className="persona-item-name" onClick={() => onSelectPersona(p.id)}>
+            <button className="persona-item-name">
               {p.name || "(untitled)"}
             </button>
             <button className="delete-btn danger" onClick={() => onDeletePersona(p.id)}>

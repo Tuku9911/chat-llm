@@ -168,7 +168,6 @@ export default function App() {
               className="form-select"
               value={settings.lang} 
               onChange={(e) => handleSetLang(e.target.value as "en" | "ja")}
-              style={{ padding: "4px 8px", fontSize: "13px" }}
             >
               <option value="en">English</option>
               <option value="ja">日本語</option>

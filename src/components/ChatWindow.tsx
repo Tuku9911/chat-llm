@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import type { ChatMessage, Persona } from "../types";
 
 interface ChatWindowProps {
@@ -11,12 +12,21 @@ interface ChatWindowProps {
 }
 
 export function ChatWindow({ messages, streaming, persona, translations }: ChatWindowProps) {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom when messages change or streaming
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
+    }
+  }, [messages, streaming]);
+
   if (!persona) {
     return <div className="empty-state">{translations.selectPersona}</div>;
   }
 
   return (
-    <div className="chat-window">
+    <div className="chat-window" ref={scrollContainerRef}>
       {messages.map(m => (
         <div
           key={m.id}

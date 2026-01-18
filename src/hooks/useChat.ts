@@ -70,13 +70,19 @@ export function useChat(persona: Persona | undefined, options?: UseChatOptions) 
     const ac = new AbortController();
     abortRef.current = ac;
 
+    // Track accumulated content
+    let accumulatedContent = "";
+
     const updateContent = async (delta: string) => {
+      accumulatedContent += delta;
+      
+      // Update state - always use current accumulated content to avoid duplication
       setMessages(prev =>
-        prev.map(m => (m.id === assistantId ? { ...m, content: m.content + delta } : m))
+        prev.map(m => (m.id === assistantId ? { ...m, content: accumulatedContent } : m))
       );
-      // persist incremental update (simple approach: overwrite same key)
-      assistantMsg.content += delta;
-      await addMessage({ ...assistantMsg });
+      
+      // Update assistantMsg for potential DB persistence
+      assistantMsg.content = accumulatedContent;
     };
 
     try {
@@ -171,6 +177,10 @@ export function useChat(persona: Persona | undefined, options?: UseChatOptions) 
       }
     } finally {
       setStreaming(false);
+      // Final save to DB after streaming completes
+      if (assistantMsg.content) {
+        await addMessage(assistantMsg);
+      }
     }
   }
 

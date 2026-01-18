@@ -11,6 +11,7 @@ interface ChatInputProps {
 
 export function ChatInput({ onSend, streaming, translations }: ChatInputProps) {
   const [input, setInput] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
   const lastSendTimeRef = useRef<number>(0);
   const RATE_LIMIT_MS = 1000; // Minimum 1 second between sends
@@ -23,6 +24,13 @@ export function ChatInput({ onSend, streaming, translations }: ChatInputProps) {
       }
     };
   }, []);
+
+  // Auto-focus input when streaming ends
+  useEffect(() => {
+    if (!streaming && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [streaming]);
 
   function handleSend() {
     const text = input.trim();
@@ -48,12 +56,18 @@ export function ChatInput({ onSend, streaming, translations }: ChatInputProps) {
       onSend(text);
       setInput("");
       debounceRef.current = null;
+      
+      // Auto-focus input after sending
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 50);
     }, 300);
   }
 
   return (
     <div className="chat-input-container">
       <input
+        ref={inputRef}
         className="chat-input"
         value={input}
         placeholder={translations.messagePlaceholder}

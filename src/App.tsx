@@ -36,12 +36,31 @@ export default function App() {
     });
 
   useEffect(() => {
-    if (settings.selectedPersonaId) {
-      setSelectedPersonaId(settings.selectedPersonaId);
-      loadMessages(settings.selectedPersonaId);
+    async function initializeSelection() {
+      // If settings has selected persona, use it
+      if (settings.selectedPersonaId) {
+        const personaExists = personas.find(p => p.id === settings.selectedPersonaId);
+        if (personaExists) {
+          setSelectedPersonaId(settings.selectedPersonaId);
+          await loadMessages(settings.selectedPersonaId);
+          return;
+        }
+      }
+      
+      // Otherwise, select first persona (should be default Elon Musk)
+      if (personas.length > 0 && !selectedPersonaId) {
+        const firstPersona = personas[0];
+        setSelectedPersonaId(firstPersona.id);
+        await loadMessages(firstPersona.id);
+        await updateSettings({ selectedPersonaId: firstPersona.id });
+      }
+    }
+    
+    if (personas.length > 0) {
+      initializeSelection();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [personas]);
 
   useEffect(() => {
     updateSettings({ selectedPersonaId });

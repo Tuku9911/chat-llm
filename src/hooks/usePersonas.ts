@@ -12,7 +12,28 @@ export function usePersonas() {
   }
 
   useEffect(() => {
-    refreshPersonas();
+    async function initializePersonas() {
+      const ps = await listPersonas();
+      
+      // Create default "Elon Musk" persona if no personas exist
+      if (ps.length === 0) {
+        const defaultPersona: Persona = {
+          id: "default-elon-musk",
+          name: "Elon Musk",
+          birthdate: "1971-06-28",
+          livedPlace: "USA",
+          details: "CEO of Tesla and SpaceX. Known for innovation, first principles thinking, and ambitious goals.",
+          gender: "male",
+          createdAt: Date.now(),
+        };
+        await upsertPersona(defaultPersona);
+        await refreshPersonas();
+      } else {
+        setPersonas(ps);
+      }
+    }
+    
+    initializePersonas();
   }, []);
 
   async function createPersona(): Promise<Persona> {
